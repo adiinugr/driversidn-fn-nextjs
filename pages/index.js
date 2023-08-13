@@ -1,6 +1,14 @@
 import Image from "next/image"
-import { FiChevronRight, FiSearch } from "react-icons/fi"
+
+// Third Party
+import { FiChevronRight } from "react-icons/fi"
 import { AiFillStar } from "react-icons/ai"
+
+// Components
+import Header from "@/components/Header"
+import Footer from "@/components/Footer"
+import RecentPost from "@/components/RecentPost"
+import LatestUpdatesDriver from "@/components/LatestUpdatesDriver"
 
 const manufacturesArray = [
   {
@@ -93,24 +101,7 @@ const latestUpdatesDriverArray = [
 export default function Home() {
   return (
     <main>
-      <header className="container mx-auto flex justify-between items-center h-[80px]">
-        <div className="text-2xl font-semibold text-primary-900">LOGO</div>
-        <nav className="text-primary-900">
-          <ul className="flex gap-10">
-            <li>Home</li>
-            <li>Recent</li>
-            <li>Most Popular</li>
-          </ul>
-        </nav>
-        <div className="flex h-fit bg-gray-100 py-[6px] px-4 items-center gap-2 rounded-lg">
-          <FiSearch size={22} className="text-gray-700" />
-          <input
-            type="text"
-            placeholder="Search"
-            className="bg-transparent p-1 focus:outline-none"
-          />
-        </div>
-      </header>
+      <Header />
 
       <section className="bg-primary-900 text-white h-[calc(100vh_-_80px)]">
         <div className="container mx-auto py-20 flex justify-between items-center gap-20 h-full">
@@ -213,90 +204,15 @@ export default function Home() {
           </div>
         </div>
         <div className="w-4/12">
-          <div className="mb-16">
-            <h3 className="mb-4 text-xl font-medium">Latest Updated Drivers</h3>
+          <RecentPost recentPostArray={recentPostArray} />
 
-            <div className="grid grid-cols-1 gap-8">
-              {recentPostArray.map((post) => (
-                <div
-                  key={post.id}
-                  className="flex justify-between items-center gap-4"
-                >
-                  <div className="w-[100px] aspect-square relative">
-                    <Image
-                      src={post.imageUrl}
-                      fill
-                      className="object-cover rounded-md"
-                      alt={post.title}
-                    />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-medium mb-2 text-gray-900">
-                      {post.title}
-                    </h3>
-
-                    <p className="text-gray-700 text-sm mb-2 line-clamp-3">
-                      {post.description}
-                    </p>
-
-                    <p className="text-xs">
-                      <span className="font-medium">{post.author}</span> -{" "}
-                      {post.published}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <h3 className="mb-4 text-xl font-medium">Recent Posts</h3>
-
-            <div className="grid grid-cols-1 gap-8">
-              {latestUpdatesDriverArray.map((post) => (
-                <div
-                  key={post.id}
-                  className="flex justify-between items-center gap-4"
-                >
-                  <div className="w-[100px] aspect-square relative">
-                    <Image
-                      src={post.imageUrl}
-                      fill
-                      className="object-cover rounded-md"
-                      alt={post.title}
-                    />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-medium mb-2 text-gray-900">
-                      {post.title}
-                    </h3>
-
-                    <p className="text-gray-700 text-sm mb-2 line-clamp-3">
-                      {post.description}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+          <LatestUpdatesDriver
+            latestUpdatesDriverArray={latestUpdatesDriverArray}
+          />
         </div>
       </section>
 
-      <footer className="bg-primary-900 text-white text-center py-10">
-        <div className="container">
-          <div className="mb-2">
-            <ul className="flex items-center justify-center gap-6">
-              <li>About Us</li>
-              <li>Terms and Conditions</li>
-              <li>Privacy Policy</li>
-              <li>Sitemap</li>
-            </ul>
-          </div>
-          <div>
-            © Copyright 2023 - 2023 Driversidn.com. All rights reserved.
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </main>
   )
 }
