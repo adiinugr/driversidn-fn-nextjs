@@ -183,7 +183,10 @@ export default function Home() {
 
             <div className="grid grid-cols-1 gap-10">
               {mostPopularDriverArray.map((driver) => (
-                <div className="flex justify-between items-center gap-8 h-[120px]">
+                <div
+                  key={driver.id}
+                  className="flex justify-between items-center gap-8 h-[120px]"
+                >
                   <div className="w-56 h-full relative">
                     <Image
                       src={driver.imageUrl}
@@ -278,6 +281,22 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      <footer className="bg-primary-900 text-white text-center py-10">
+        <div className="container">
+          <div className="mb-2">
+            <ul className="flex items-center justify-center gap-6">
+              <li>About Us</li>
+              <li>Terms and Conditions</li>
+              <li>Privacy Policy</li>
+              <li>Sitemap</li>
+            </ul>
+          </div>
+          <div>
+            © Copyright 2023 - 2023 Driversidn.com. All rights reserved.
+          </div>
+        </div>
+      </footer>
     </main>
   )
 }
