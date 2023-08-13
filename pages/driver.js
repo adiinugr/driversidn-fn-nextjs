@@ -184,8 +184,8 @@ function Driver() {
                       <p className="text-sm text-gray-700">6 months ago</p>
                     </div>
                     <p>
-                      Drivers work fine. I've been using it for a very long time
-                      and had no problems.
+                      Drivers work fine. I&apos;ve been using it for a very long
+                      time and had no problems.
                     </p>
                   </div>
                 </div>
