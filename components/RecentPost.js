@@ -17,6 +17,7 @@ function RecentPost({ recentPostArray }) {
                 fill
                 className="object-cover rounded-md"
                 alt={post.title}
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               />
             </div>
             <div className="flex-1">

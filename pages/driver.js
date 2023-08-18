@@ -6,7 +6,7 @@ import { latestUpdatesDriverArray, recentPostArray } from "@/data/dummyData"
 import Image from "next/image"
 import React from "react"
 import { AiFillStar } from "react-icons/ai"
-import { FiChevronRight, FiDownload, FiEdit, FiStar } from "react-icons/fi"
+import { FiChevronRight, FiDownload, FiEdit } from "react-icons/fi"
 
 function Driver() {
   return (

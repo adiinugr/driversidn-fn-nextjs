@@ -12,6 +12,8 @@ import LatestUpdatesDriver from "@/components/LatestUpdatesDriver"
 
 // Data
 import { latestUpdatesDriverArray, recentPostArray } from "@/data/dummyData"
+import Link from "next/link"
+import DriverCard from "@/components/DriverCard"
 
 const manufacturesArray = [
   {
@@ -80,12 +82,18 @@ export default function Home() {
               your printing experience.
             </p>
             <div className="flex gap-8">
-              <button className="btn bg-white text-primary-900 ">
+              <Link
+                href="/category/most-populars"
+                className="btn bg-white text-primary-900 hover:text-primary-600 transition-colors"
+              >
                 Popular Drivers
-              </button>
-              <button className="btn border border-white">
+              </Link>
+              <Link
+                href="/category/latest-updates"
+                className="btn border border-white hover:bg-white hover:text-blue-900 transition-colors"
+              >
                 Latest Updates
-              </button>
+              </Link>
             </div>
           </div>
           <div className="w-1/2">
@@ -131,41 +139,20 @@ export default function Home() {
               <h2 className="text-3xl font-medium text-gray-800 mb-5">
                 Most Popular Drivers
               </h2>
-              <div className="flex items-center gap-2 text-primary-500 font-medium">
+              <Link
+                href="/category/most-populars"
+                className="flex items-center gap-2 text-primary-900 hover:text-primary-600 font-medium transition-colors"
+              >
                 <p>See All</p>
                 <FiChevronRight size={20} />
-              </div>
+              </Link>
             </div>
 
-            <div className="grid grid-cols-1 gap-10">
+            {/* <div className="grid grid-cols-1 gap-10">
               {mostPopularDriverArray.map((driver) => (
-                <div
-                  key={driver.id}
-                  className="flex justify-between items-center gap-8 h-[120px]"
-                >
-                  <div className="w-56 h-full relative">
-                    <Image
-                      src={driver.imageUrl}
-                      fill
-                      className="object-cover"
-                      alt={driver.brandName}
-                    />
-                  </div>
-                  <div>
-                    <h3 className="font-medium text-xl mb-2 text-gray-900">
-                      {driver.brandName}
-                    </h3>
-                    <div className="flex gap-2 items-center mb-2">
-                      <AiFillStar size={24} className="text-yellow-500" />
-                      <p>{driver.rating}</p>
-                    </div>
-                    <p className="text-gray-700 line-clamp-2">
-                      {driver.description}
-                    </p>
-                  </div>
-                </div>
+                <DriverCard driver={driver} />
               ))}
-            </div>
+            </div> */}
           </div>
         </div>
         <div className="w-4/12">
