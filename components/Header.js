@@ -6,7 +6,7 @@ import { FiSearch } from "react-icons/fi"
 function Header() {
   return (
     <header className="fixed top-0 left-0 bg-white w-full h-[80px] z-20 shadow">
-      <div className="container px-16 xl:px-0 flex justify-between items-center h-full">
+      <div className="container flex justify-between items-center h-full">
         <div className="text-2xl font-semibold text-primary-900">LOGO</div>
         <nav className="text-primary-900">
           <ul className="flex gap-10">

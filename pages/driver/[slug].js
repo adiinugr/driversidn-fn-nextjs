@@ -100,7 +100,7 @@ function DriverPage({ data }) {
   return (
     <main>
       <Header />
-      <section className="container px-16 xl:px-0 pt-36 pb-16">
+      <section className="container pt-36 pb-16">
         <div className="flex items-center gap-2">
           <Link href="/" className="text-primary-600 hover:underline">
             Home
@@ -174,7 +174,8 @@ function DriverPage({ data }) {
             <p className="bg-gray-100 p-4 rounded-lg mt-8 text-sm">
               <span className="text-red-600">Attention!</span> Your operating
               system may not be detected. Please use the download button at the
-              bottom of this page according to your device's operating system.
+              bottom of this page according to your device&apos;s operating
+              system.
             </p>
             <article className="mt-10 driver-description">
               {parse(driver.description)}

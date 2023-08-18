@@ -50,7 +50,7 @@ function MostPopularPage() {
 
   useEffect(() => {
     fetchData(0, 6)
-  }, [])
+  }, [fetchData])
 
   return (
     <main>
