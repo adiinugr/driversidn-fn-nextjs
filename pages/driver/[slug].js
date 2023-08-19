@@ -17,10 +17,8 @@ import Footer from "@/components/Footer"
 
 // Const
 const token = process.env.NEXT_PUBLIC_STRAPI_API_TOKEN
-const path = `/drivers`
 const options = { headers: { Authorization: `Bearer ${token}` } }
 
-import { latestUpdatesDriverArray, recentPostArray } from "@/data/dummyData"
 import Link from "next/link"
 import platform from "platform"
 import Loader from "@/components/Loader"
@@ -70,8 +68,8 @@ const ButtonDownloadComponent = ({
   )
 }
 
-function DriverPage({ data }) {
-  const driver = data[0].attributes
+function DriverPage({ singleDriver, latestUpdatesDriver, recentPost }) {
+  const driver = singleDriver[0].attributes
   const [deviceOS, setDeviceOS] = useState()
   const [buttonLoading, setButtonLoading] = useState(false)
   const [deviceDownloadUrl, setDeviceDownloadUrl] = useState([])
@@ -79,13 +77,15 @@ function DriverPage({ data }) {
   const getDeviceDownloadUrl = () => {
     setButtonLoading(true)
 
-    const deviceArray = data[0].attributes.driver_files.data.filter((item) => {
-      const osArray = item.attributes.operating_systems.data
+    const deviceArray = singleDriver[0].attributes.driver_files.data.filter(
+      (item) => {
+        const osArray = item.attributes.operating_systems.data
 
-      const mappedOsArray = osArray.map((os) => os.attributes.name)
+        const mappedOsArray = osArray.map((os) => os.attributes.name)
 
-      return mappedOsArray.includes(deviceOS)
-    })
+        return mappedOsArray.includes(deviceOS)
+      }
+    )
 
     setButtonLoading(false)
 
@@ -305,10 +305,8 @@ function DriverPage({ data }) {
             </div>
           </div>
           <div className="w-4/12">
-            <RecentPost recentPostArray={recentPostArray} />
-            <LatestUpdatesDriver
-              latestUpdatesDriverArray={latestUpdatesDriverArray}
-            />
+            <RecentPost recentPost={recentPost} />
+            <LatestUpdatesDriver latestUpdatesDriver={latestUpdatesDriver} />
           </div>
         </div>
       </section>
@@ -320,7 +318,7 @@ function DriverPage({ data }) {
 export default DriverPage
 
 export const getStaticPaths = async () => {
-  const responseData = await fetchAPI(path, {}, options)
+  const responseData = await fetchAPI("/drivers", {}, options)
 
   const paths = responseData.data.map((data) => {
     return {
@@ -353,7 +351,44 @@ export const getStaticProps = async ({ params }) => {
       driver_files: { populate: "*" }
     }
   }
-  const responseData = await fetchAPI(path, urlParamsObject, options)
 
-  return { props: { data: responseData.data } }
+  const singleDriver = await fetchAPI("/drivers", urlParamsObject, options)
+
+  const latestUpdatesDriver = await fetchAPI(
+    "/drivers",
+    {
+      sort: { downloadCount: "desc" },
+      pagination: {
+        limit: 3
+      },
+      populate: {
+        author: {
+          fields: ["name"]
+        },
+        image: { fields: ["url"] }
+      }
+    },
+    options
+  )
+
+  const recentPost = await fetchAPI(
+    "/blogs",
+    {
+      populate: {
+        author: {
+          fields: ["name"]
+        },
+        image: { fields: ["url"] }
+      }
+    },
+    options
+  )
+
+  return {
+    props: {
+      singleDriver: singleDriver.data,
+      latestUpdatesDriver: latestUpdatesDriver.data,
+      recentPost: recentPost.data
+    }
+  }
 }

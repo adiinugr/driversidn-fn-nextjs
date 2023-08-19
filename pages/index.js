@@ -1,76 +1,29 @@
 import Image from "next/image"
+import Link from "next/link"
 
 // Third Party
 import { FiChevronRight } from "react-icons/fi"
-import { AiFillStar } from "react-icons/ai"
 
 // Components
 import Header from "@/components/Header"
 import Footer from "@/components/Footer"
 import RecentPost from "@/components/RecentPost"
 import LatestUpdatesDriver from "@/components/LatestUpdatesDriver"
-
-// Data
-import { latestUpdatesDriverArray, recentPostArray } from "@/data/dummyData"
-import Link from "next/link"
 import DriverCard from "@/components/DriverCard"
 
-const manufacturesArray = [
-  {
-    id: 1,
-    title: "Epson",
-    imageUrl: "/images/printers/epson.png"
-  },
-  {
-    id: 2,
-    title: "Canon",
-    imageUrl: "/images/printers/canon.png"
-  },
-  {
-    id: 3,
-    title: "Brother",
-    imageUrl: "/images/printers/brother.png"
-  },
-  {
-    id: 4,
-    title: "HP",
-    imageUrl: "/images/printers/hp.png"
-  }
-]
+// Utils
+import { fetchAPI } from "@/utils/fetch-api"
 
-const mostPopularDriverArray = [
-  {
-    id: 1,
-    brandName: "Canon LBP2900b Printer Driver",
-    imageUrl: "/images/printer.webp",
-    rating: "4.5",
-    description:
-      "The Canon LBP2900 Driver is a free utility officially developed and distributed by Canon Inc for its line of desktop printers. With this driver package"
-  },
-  {
-    id: 2,
-    brandName: "Canon LBP2900b Printer Driver",
-    imageUrl: "/images/printer.webp",
-    rating: "4.5",
-    description:
-      "The Canon LBP2900 Driver is a free utility officially developed and distributed by Canon Inc for its line of desktop printers. With this driver package"
-  },
-  {
-    id: 3,
-    brandName: "Canon LBP2900b Printer Driver",
-    imageUrl: "/images/printer.webp",
-    rating: "4.5",
-    description:
-      "The Canon LBP2900 Driver is a free utility officially developed and distributed by Canon Inc for its line of desktop printers. With this driver package"
-  }
-]
-
-export default function Home() {
+export default function Home({
+  mostPopularDriver,
+  recentDriver,
+  blog,
+  manufacture
+}) {
   return (
     <main>
       <Header />
-
-      <section className="bg-primary-900 text-white h-[calc(100vh_-_80px)]">
+      <section className="bg-primary-900 text-white h-[calc(100vh_-_80px)] mt-[80px]">
         <div className="container mx-auto py-20 flex justify-between items-center gap-20 h-full">
           <div className="w-1/2">
             <h1 className="text-3xl font-bold mb-6">
@@ -105,6 +58,8 @@ export default function Home() {
                 fill
                 className="object-cover rounded-3xl"
                 alt="Printer"
+                priority
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               />
             </div>
           </div>
@@ -122,15 +77,20 @@ export default function Home() {
               world. We provide official drivers that are safe and secure.
             </p>
             <div className="grid grid-cols-4 gap-6 mt-4">
-              {manufacturesArray.map((manufacture) => (
-                <div key={manufacture.id} className="relative h-12">
+              {manufacture.map((item) => (
+                <Link
+                  href={`/manufacture/${item.attributes.slug}`}
+                  key={item.id}
+                  className="relative h-12"
+                >
                   <Image
-                    src={manufacture.imageUrl}
+                    src={`/images/printers/${item.attributes.slug}.png`}
                     fill
                     className="object-contain"
-                    alt={manufacture.title}
+                    alt={item.attributes.name}
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                   />
-                </div>
+                </Link>
               ))}
             </div>
           </div>
@@ -148,23 +108,87 @@ export default function Home() {
               </Link>
             </div>
 
-            {/* <div className="grid grid-cols-1 gap-10">
-              {mostPopularDriverArray.map((driver) => (
-                <DriverCard driver={driver} />
+            <div className="grid grid-cols-1 gap-10">
+              {mostPopularDriver.map((driver) => (
+                <DriverCard key={driver.id} driver={driver} />
               ))}
-            </div> */}
+            </div>
           </div>
         </div>
         <div className="w-4/12">
-          <RecentPost recentPostArray={recentPostArray} />
+          <RecentPost recentPost={blog} />
 
-          <LatestUpdatesDriver
-            latestUpdatesDriverArray={latestUpdatesDriverArray}
-          />
+          <LatestUpdatesDriver latestUpdatesDriver={recentDriver} />
         </div>
       </section>
 
       <Footer />
     </main>
   )
+}
+
+export async function getServerSideProps() {
+  const token = process.env.NEXT_PUBLIC_STRAPI_API_TOKEN
+  const urlParamsObject = {
+    populate: {
+      author: {
+        fields: ["name"]
+      },
+      image: { fields: ["url"] },
+      ratings: { populate: "*" }
+    }
+  }
+  const options = { headers: { Authorization: `Bearer ${token}` } }
+
+  const mostPopularDriver = await fetchAPI(
+    "/drivers",
+    {
+      sort: { createdAt: "desc" },
+      pagination: {
+        limit: 5
+      },
+      ...urlParamsObject
+    },
+    options
+  )
+
+  const recentDriver = await fetchAPI(
+    "/drivers",
+    {
+      sort: { downloadCount: "desc" },
+      pagination: {
+        limit: 3
+      },
+      ...urlParamsObject
+    },
+    options
+  )
+
+  const blog = await fetchAPI(
+    "/blogs",
+    {
+      populate: {
+        author: {
+          fields: ["name"]
+        },
+        image: { fields: ["url"] }
+      }
+    },
+    options
+  )
+
+  const manufacture = await fetchAPI(
+    "/manufactures",
+    { sort: { name: "asc" } },
+    options
+  )
+
+  return {
+    props: {
+      mostPopularDriver: mostPopularDriver.data,
+      recentDriver: recentDriver.data,
+      blog: blog.data,
+      manufacture: manufacture.data
+    }
+  }
 }

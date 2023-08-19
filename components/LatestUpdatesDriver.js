@@ -1,30 +1,39 @@
 import Image from "next/image"
+import Link from "next/link"
 
-function LatestUpdatesDriver({ latestUpdatesDriverArray }) {
+function LatestUpdatesDriver({ latestUpdatesDriver }) {
   return (
     <div>
-      <h3 className="mb-4 text-xl font-medium">Recent Posts</h3>
+      <h3 className="mb-4 text-xl font-medium">Latest Updated Drivers</h3>
 
       <div className="grid grid-cols-1 gap-8">
-        {latestUpdatesDriverArray.map((post) => (
+        {latestUpdatesDriver.map((driver) => (
           <div
-            key={post.id}
+            key={driver.id}
             className="flex justify-between items-center gap-4"
           >
-            <div className="w-[100px] aspect-square relative">
+            <Link
+              href={`/driver/${driver.attributes.slug}`}
+              className="w-[100px] aspect-square block relative"
+            >
               <Image
-                src={post.imageUrl}
+                src={driver.attributes.image.data.attributes.url}
                 fill
                 className="object-cover rounded-md"
-                alt={post.title}
+                alt={driver.attributes.title}
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               />
-            </div>
+            </Link>
             <div className="flex-1">
-              <h3 className="font-medium mb-2 text-gray-900">{post.title}</h3>
+              <Link
+                href={`/driver/${driver.attributes.slug}`}
+                className="font-medium mb-2 text-gray-900"
+              >
+                {driver.attributes.title}
+              </Link>
 
               <p className="text-gray-700 text-sm mb-2 line-clamp-3">
-                {post.description}
+                {driver.attributes.shortDescription}
               </p>
             </div>
           </div>
