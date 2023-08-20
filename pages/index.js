@@ -7,9 +7,12 @@ import { FiChevronRight } from "react-icons/fi"
 // Components
 import Header from "@/components/Header"
 import Footer from "@/components/Footer"
-import RecentPost from "@/components/RecentPost"
 import LatestUpdatesDriver from "@/components/LatestUpdatesDriver"
 import DriverCard from "@/components/DriverCard"
+
+const RecentPost = dynamic(() => import("@/components/RecentPost"), {
+  ssr: false
+})
 
 // Utils
 import { fetchAPI } from "@/utils/fetch-api"

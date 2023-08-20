@@ -1,27 +1,42 @@
 import React, { useEffect, useState } from "react"
 import Image from "next/image"
+import Link from "next/link"
+import { useRouter } from "next/router"
+import dynamic from "next/dynamic"
 
 // Third Party
 import parse from "html-react-parser"
 import { FiChevronRight, FiDownload, FiEdit } from "react-icons/fi"
 import { AiFillStar } from "react-icons/ai"
+import platform from "platform"
+import { v4 as uuidv4 } from "uuid"
 
 // Utils
 import { fetchAPI } from "@/utils/fetch-api"
+import { getStrapiURL } from "@/utils/api-helpers"
 
 // Components
 import Header from "@/components/Header"
-import RecentPost from "@/components/RecentPost"
 import LatestUpdatesDriver from "@/components/LatestUpdatesDriver"
 import Footer from "@/components/Footer"
+import Loader from "@/components/Loader"
+import RatingStar from "@/components/RatingStar"
+import ReviewModal from "@/components/ReviewModal"
+
+const RecentPost = dynamic(() => import("@/components/RecentPost"), {
+  ssr: false
+})
+
+const ReviewCard = dynamic(() => import("@/components/ReviewCard"), {
+  ssr: false
+})
+
+// Helpers
+import { getAverageOfNumberArray } from "@/helpers/array"
 
 // Const
 const token = process.env.NEXT_PUBLIC_STRAPI_API_TOKEN
 const options = { headers: { Authorization: `Bearer ${token}` } }
-
-import Link from "next/link"
-import platform from "platform"
-import Loader from "@/components/Loader"
 
 const joinOperatingSystem = (array) => {
   let newArray = []
@@ -36,7 +51,8 @@ const joinOperatingSystem = (array) => {
 const ButtonDownloadComponent = ({
   buttonLoading,
   deviceDownloadUrl,
-  deviceOS
+  deviceOS,
+  handleDownloadDriver
 }) => {
   if (buttonLoading) {
     return (
@@ -48,16 +64,20 @@ const ButtonDownloadComponent = ({
 
   if (deviceDownloadUrl[0]) {
     return (
-      <Link
-        className="flex w-fit items-center gap-4 bg-secondary-500 py-2 px-5 rounded-xl text-white mt-6 mx-auto"
-        href={deviceDownloadUrl[0].attributes.file.data.attributes.url}
+      <button
+        onClick={() =>
+          handleDownloadDriver(
+            deviceDownloadUrl[0].attributes.file.data.attributes.url
+          )
+        }
+        className="flex w-fit items-center gap-4 bg-secondary-500 py-2 px-5 rounded-xl text-white mt-6 mx-auto hover:bg-green-700 transition-colors"
       >
         <div className="text-left">
           <p className="font-semibold text-xl">Free Download</p>
           <p className="font-medium text-sm">for {deviceOS}</p>
         </div>
         <FiDownload size={26} />
-      </Link>
+      </button>
     )
   }
 
@@ -69,10 +89,19 @@ const ButtonDownloadComponent = ({
 }
 
 function DriverPage({ singleDriver, latestUpdatesDriver, recentPost }) {
+  const router = useRouter()
+
   const driver = singleDriver[0].attributes
   const [deviceOS, setDeviceOS] = useState()
   const [buttonLoading, setButtonLoading] = useState(false)
   const [deviceDownloadUrl, setDeviceDownloadUrl] = useState([])
+  const [downloadCount, setDownloadCount] = useState(
+    Number(driver.downloadCount)
+  )
+  const [ratings, setRatings] = useState(driver.ratings.data)
+  const [isOpenReviewModal, setIsOpenReviewModal] = useState(false)
+
+  const averageRating = getAverageOfNumberArray(ratings)
 
   const getDeviceDownloadUrl = () => {
     setButtonLoading(true)
@@ -90,6 +119,76 @@ function DriverPage({ singleDriver, latestUpdatesDriver, recentPost }) {
     setButtonLoading(false)
 
     return deviceArray
+  }
+
+  const handleDownloadDriver = async (url) => {
+    try {
+      setDownloadCount(Number(downloadCount) + 1)
+
+      await router.push(url)
+
+      await fetch(
+        `https://dashboard.driversidn.com/api/drivers/${singleDriver[0].id}`,
+
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`
+          },
+          method: "PUT",
+          body: JSON.stringify({
+            data: { downloadCount: Number(downloadCount) + 1 }
+          })
+        }
+      )
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  const handleSubmitReview = async (value) => {
+    const { name, message, ratingValue } = value
+
+    try {
+      await fetch(
+        getStrapiURL(`/ratings`),
+
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`
+          },
+          method: "POST",
+          body: JSON.stringify({
+            data: {
+              name,
+              message,
+              ratingValue,
+              driver: {
+                connect: [singleDriver[0].id]
+              }
+            }
+          })
+        }
+      )
+
+      setRatings((prevState) => [
+        {
+          id: uuidv4(),
+          attributes: {
+            name,
+            message,
+            ratingValue,
+            createdAt: new Date().toISOString()
+          }
+        },
+        ...prevState
+      ])
+
+      setIsOpenReviewModal(false)
+    } catch (error) {
+      console.log(error)
+    }
   }
 
   useEffect(() => {
@@ -145,7 +244,7 @@ function DriverPage({ singleDriver, latestUpdatesDriver, recentPost }) {
                   </div>
                   <div className="flex items-center gap-1">
                     <FiDownload size={20} />
-                    <p>{driver.downloadCount ? driver.downloadCount : 0}</p>
+                    <p>{downloadCount ? downloadCount : 0}</p>
                   </div>
                 </div>
               </div>
@@ -170,6 +269,7 @@ function DriverPage({ singleDriver, latestUpdatesDriver, recentPost }) {
               buttonLoading={buttonLoading}
               deviceDownloadUrl={deviceDownloadUrl}
               deviceOS={deviceOS}
+              handleDownloadDriver={handleDownloadDriver}
             />
             <p className="bg-gray-100 p-4 rounded-lg mt-8 text-sm">
               <span className="text-red-600">Attention!</span> Your operating
@@ -223,12 +323,16 @@ function DriverPage({ singleDriver, latestUpdatesDriver, recentPost }) {
                         Mb
                       </td>
                       <td className="px-6 py-4">
-                        <Link
-                          href={file.attributes.file.data.attributes.url}
+                        <button
+                          onClick={() =>
+                            handleDownloadDriver(
+                              file.attributes.file.data.attributes.url
+                            )
+                          }
                           className="text-primary-600 hover:underline hover:underline-offset-2"
                         >
                           Download
-                        </Link>
+                        </button>
                       </td>
                     </tr>
                   ))}
@@ -238,69 +342,34 @@ function DriverPage({ singleDriver, latestUpdatesDriver, recentPost }) {
             <div className="mt-16">
               <h1 className="font-medium text-2xl mb-2">User Reviews</h1>
               <div className="flex justify-between items-center gap-10">
-                <div className="flex gap-4 items-baseline">
-                  <p className="text-5xl text-orange">5.0</p>
-                  <div className="flex items-center gap-1">
-                    <AiFillStar size={30} className="text-orange" />
-                    <AiFillStar size={30} className="text-orange" />
-                    <AiFillStar size={30} className="text-orange" />
-                    <AiFillStar size={30} className="text-orange" />
-                    <AiFillStar size={30} className="text-orange" />
-                  </div>
-                  <p className="text-gray-700">8000 reviews</p>
+                <div className="flex gap-4 items-end">
+                  <p className="text-5xl text-orange">
+                    {averageRating ? averageRating : 0}
+                  </p>
+                  <RatingStar ratingValue={averageRating} size="large" />
+                  <p className="text-gray-700">{ratings.length} reviews</p>
                 </div>
-                <button className="btn flex items-center gap-2 bg-primary-700 text-white">
-                  <FiEdit size={22} />
-                  <p>Write Review</p>
+                <button
+                  onClick={() => setIsOpenReviewModal(true)}
+                  className="btn flex items-center gap-2 bg-primary-700 hover:bg-primary-800 transition-colors text-white text-sm"
+                >
+                  <FiEdit size={20} />
+                  <p className="flex-1">Write Review</p>
                 </button>
               </div>
+
+              <ReviewModal
+                isOpenReviewModal={isOpenReviewModal}
+                onCloseModal={() => setIsOpenReviewModal(false)}
+                handleSubmitReview={handleSubmitReview}
+              />
+
               <hr className="my-6" />
 
               <div className="grid grid-cols-1 gap-6">
-                <div className="flex items-start gap-4">
-                  <div className="h-10 aspect-square rounded-full bg-green-500 text-white grid place-content-center text-xl font-medium">
-                    K
-                  </div>
-                  <div>
-                    <p className="font-semibold mb-1">Kenan</p>
-                    <div className="flex items-center gap-2 mb-2">
-                      <div className="flex items-center gap-1">
-                        <AiFillStar size={22} className="text-orange" />
-                        <AiFillStar size={22} className="text-orange" />
-                        <AiFillStar size={22} className="text-orange" />
-                        <AiFillStar size={22} className="text-orange" />
-                        <AiFillStar size={22} className="text-orange" />
-                      </div>
-                      <p className="text-sm text-gray-700">6 months ago</p>
-                    </div>
-                    <p>
-                      Drivers work fine. I&apos;ve been using it for a very long
-                      time and had no problems.
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-4">
-                  <div className="h-10 aspect-square rounded-full bg-blue-600 text-white grid place-content-center text-xl font-medium">
-                    A
-                  </div>
-                  <div>
-                    <p className="font-semibold mb-1">Anastasya Abigail</p>
-                    <div className="flex items-center gap-2 mb-2">
-                      <div className="flex items-center gap-1">
-                        <AiFillStar size={22} className="text-orange" />
-                        <AiFillStar size={22} className="text-orange" />
-                        <AiFillStar size={22} className="text-orange" />
-                        <AiFillStar size={22} className="text-orange" />
-                        <AiFillStar size={22} className="text-orange" />
-                      </div>
-                      <p className="text-sm text-gray-700">10 months ago</p>
-                    </div>
-                    <p>
-                      I really enjoy using the drivers on this website. Thank
-                      You.
-                    </p>
-                  </div>
-                </div>
+                {ratings.slice(0, 4).map((rating) => (
+                  <ReviewCard rating={rating} key={rating.id} />
+                ))}
               </div>
             </div>
           </div>
@@ -346,7 +415,12 @@ export const getStaticProps = async ({ params }) => {
         populate: "*"
       },
       image: { populate: "*" },
-      ratings: { populate: "*" },
+      ratings: {
+        populate: "*",
+        sort: {
+          createdAt: "desc"
+        }
+      },
       manufacture: { fields: ["name"] },
       driver_files: { populate: "*" }
     }

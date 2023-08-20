@@ -27,7 +27,7 @@ function LatestUpdatesDriver({ latestUpdatesDriver }) {
             <div className="flex-1">
               <Link
                 href={`/driver/${driver.attributes.slug}`}
-                className="font-medium mb-2 text-gray-900"
+                className="font-medium mb-2 text-gray-900 hover:underline hover:underline-offset-2 hover:text-primary-900"
               >
                 {driver.attributes.title}
               </Link>
