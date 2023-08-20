@@ -1,5 +1,6 @@
 import formatDistance from "date-fns/formatDistance"
 import Image from "next/image"
+import Link from "next/link"
 
 function RecentPost({ recentPost }) {
   return (
@@ -12,7 +13,10 @@ function RecentPost({ recentPost }) {
             key={post.id}
             className="flex justify-between items-center gap-4"
           >
-            <div className="w-[100px] aspect-square relative">
+            <Link
+              href={`/blog/${post.attributes.slug}`}
+              className="w-[100px] aspect-square block relative"
+            >
               <Image
                 src={post.attributes.image.data.attributes.url}
                 fill
@@ -20,11 +24,14 @@ function RecentPost({ recentPost }) {
                 alt={post.attributes.title}
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               />
-            </div>
+            </Link>
             <div className="flex-1">
-              <h4 className="font-medium mb-2 text-gray-900">
+              <Link
+                href={`/blog/${post.attributes.slug}`}
+                className="font-medium mb-2 text-gray-900 hover:underline hover:underline-offset-2 hover:text-primary-900"
+              >
                 {post.attributes.title}
-              </h4>
+              </Link>
 
               <p className="text-gray-700 text-sm mb-2 line-clamp-3">
                 {post.attributes.shortDescription}

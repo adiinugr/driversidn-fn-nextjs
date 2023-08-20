@@ -3,6 +3,7 @@ import Link from "next/link"
 
 // Third Party
 import { FiChevronRight } from "react-icons/fi"
+import dynamic from "next/dynamic"
 
 // Components
 import Header from "@/components/Header"

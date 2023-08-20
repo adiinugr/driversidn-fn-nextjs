@@ -33,6 +33,25 @@ body {
   }
 }
 
+.blog-description {
+  h2 {
+    @apply text-xl font-medium mb-2;
+  }
+
+  p {
+    @apply mb-2;
+  }
+
+  ol {
+    @apply list-decimal ml-3;
+  }
+
+  figure,
+  img {
+    @apply mx-auto mb-4;
+  }
+}
+
 .star {
   clip-path: polygon(
     50% 0%,
