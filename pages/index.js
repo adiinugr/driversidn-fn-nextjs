@@ -27,9 +27,9 @@ export default function Home({
   return (
     <main>
       <Header />
-      <section className="bg-primary-900 text-white h-[calc(100vh_-_80px)] mt-[80px]">
-        <div className="container mx-auto py-20 flex justify-between items-center gap-20 h-full">
-          <div className="w-1/2">
+      <section className="bg-primary-900 text-white xl:h-[calc(100vh_-_80px)] 2xl:h-fit mt-[80px]">
+        <div className="container mx-auto py-20 flex flex-col-reverse xl:flex-row justify-between items-center gap-20 h-full">
+          <div className="w-full xl:w-1/2">
             <h1 className="text-3xl font-bold mb-6">
               Discover Your One-Stop Destination for Printer Driver Downloads
             </h1>
@@ -38,7 +38,7 @@ export default function Home({
               ultimate source for a wide range of printer drivers to enhance
               your printing experience.
             </p>
-            <div className="flex gap-8">
+            <div className="flex flex-col xl:flex-row gap-6 xl:gap-8">
               <Link
                 href="/category/most-populars"
                 className="btn bg-white text-primary-900 hover:text-primary-600 transition-colors"
@@ -53,7 +53,7 @@ export default function Home({
               </Link>
             </div>
           </div>
-          <div className="w-1/2">
+          <div className="w-full xl:w-1/2">
             <div className="relative h-[340px] w-[280px] mx-auto">
               <div className="w-[290px] h-[290px] absolute rounded-full bg-primary-500 blur-circle transform top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"></div>
               <div className="abolute w-full h-full border border-white rounded-3xl rotate-[-20deg]"></div>
@@ -70,10 +70,10 @@ export default function Home({
         </div>
       </section>
 
-      <section className="container py-24 flex gap-24">
-        <div className="w-8/12">
+      <section className="container py-16 xl:py-24 flex flex-col xl:flex-row gap-24">
+        <div className="w-full xl:w-8/12">
           <div className="mb-20">
-            <h2 className="text-3xl font-medium text-gray-800 mb-4">
+            <h2 className="text-2xl xl:text-3xl font-medium text-gray-800 mb-4">
               Manufactures
             </h2>
             <p>
@@ -99,8 +99,8 @@ export default function Home({
             </div>
           </div>
           <div>
-            <div className="flex justify-between items-baseline mb-4">
-              <h2 className="text-3xl font-medium text-gray-800 mb-5">
+            <div className="flex justify-between items-baseline mb-4 gap-10">
+              <h2 className="flex-1 text-2xl xl:text-3xl font-medium text-gray-800 mb-4">
                 Most Popular Drivers
               </h2>
               <Link
@@ -119,9 +119,8 @@ export default function Home({
             </div>
           </div>
         </div>
-        <div className="w-4/12">
+        <div className="w-full xl:w-4/12">
           <RecentPost recentPost={blog} />
-
           <LatestUpdatesDriver latestUpdatesDriver={recentDriver} />
         </div>
       </section>

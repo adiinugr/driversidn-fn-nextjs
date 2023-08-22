@@ -15,7 +15,7 @@ function CategoryTitle({ imageUrl, title, subtitle }) {
       <div className="absolute top-0 left-0 w-full h-full bg-gray-900/60"></div>
       <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-center">
         <h1 className="text-2xl font-semibold mb-2">{title}</h1>
-        <p>{subtitle}</p>
+        <p className="hidden xl:block">{subtitle}</p>
       </div>
     </div>
   )

@@ -11,6 +11,7 @@ import { fetchAPI } from "@/utils/fetch-api"
 import Header from "@/components/Header"
 import RecentPost from "@/components/RecentPost"
 import LatestUpdatesDriver from "@/components/LatestUpdatesDriver"
+import Footer from "@/components/Footer"
 
 // Utils
 import { formatDate } from "@/utils/api-helpers"
@@ -28,8 +29,8 @@ function BlogPage({ singleBlog, recentPost, latestUpdatesDriver }) {
     <main>
       <Header />
       <section className="container pt-24 pb-16">
-        <div className="flex gap-24 mt-12">
-          <div className="w-8/12">
+        <div className="flex flex-col xl:flex-row gap-24 mt-12">
+          <div className="w-full xl:w-8/12">
             <div className="w-full h-72 relative">
               <Image
                 src={blog.image.data.attributes.url}
@@ -50,12 +51,13 @@ function BlogPage({ singleBlog, recentPost, latestUpdatesDriver }) {
               {parse(blog.content)}
             </article>
           </div>
-          <div className="w-4/12">
+          <div className="w-full xl:w-4/12">
             <RecentPost recentPost={recentPost} />
             <LatestUpdatesDriver latestUpdatesDriver={latestUpdatesDriver} />
           </div>
         </div>
       </section>
+      <Footer />
     </main>
   )
 }

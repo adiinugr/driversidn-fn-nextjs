@@ -5,6 +5,7 @@ import { fetchAPI } from "@/utils/fetch-api"
 import DataComponent from "@/components/DataComponent"
 import Header from "@/components/Header"
 import BrandTitle from "@/components/BrandTitle"
+import Footer from "@/components/Footer"
 
 // Const
 const token = process.env.NEXT_PUBLIC_STRAPI_API_TOKEN
@@ -26,6 +27,7 @@ function LatestUpdatesPage({ data, error }) {
           <DataComponent data={data} error={error} />
         </div>
       </section>
+      <Footer />
     </main>
   )
 }

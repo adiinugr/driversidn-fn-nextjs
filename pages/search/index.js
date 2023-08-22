@@ -7,6 +7,7 @@ import { fetchAPI } from "@/utils/fetch-api"
 // Components
 import DataComponent from "@/components/DataComponent"
 import Header from "@/components/Header"
+import Footer from "@/components/Footer"
 
 function LatestUpdatesPage() {
   const [data, setData] = useState([])
@@ -67,9 +68,16 @@ function LatestUpdatesPage() {
       <section className="container pt-36 pb-16">
         <h1 className="text-2xl font-semibold text-gray-800">Search Result</h1>
         <div className="mt-16">
-          <DataComponent isLoading={isLoading} error={error} data={data} />
+          {data.length === 0 ? (
+            <div className="w-full h-52 rounded-xl grid place-content-center bg-gray-100 text-gray-800">
+              Driver not found!
+            </div>
+          ) : (
+            <DataComponent isLoading={isLoading} error={error} data={data} />
+          )}
         </div>
       </section>
+      <Footer />
     </main>
   )
 }

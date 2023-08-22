@@ -12,9 +12,9 @@ function DriverCard({ driver }) {
   return (
     <div
       key={driver.id}
-      className="flex justify-between items-center gap-8 border-2 rounded-xl p-4"
+      className="flex flex-col xl:flex-row justify-between items-center gap-8 border-2 rounded-xl p-4"
     >
-      <div className="w-36 h-full">
+      <div className="w-36 aspect-square xl:aspect-auto xl:h-full">
         <Link
           href={`/driver/${driver.attributes.slug}`}
           className="block h-full w-full relative"

@@ -18,7 +18,7 @@ const DataComponent = ({ isLoading, error, data }) => {
       )
     } else if (data) {
       return (
-        <div className="grid grid-cols-2 gap-10">
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-10">
           {data.map((driver, index) => (
             <DriverCard key={index} driver={driver} />
           ))}

@@ -16,7 +16,7 @@ body {
 }
 
 .container {
-  @apply max-w-[75rem] mx-auto px-16 xl:px-0;
+  @apply max-w-[75rem] mx-auto px-6 md:px-16 xl:px-0;
 }
 
 .driver-description {

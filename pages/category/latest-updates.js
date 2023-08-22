@@ -7,6 +7,7 @@ import { fetchAPI } from "@/utils/fetch-api"
 import DataComponent from "@/components/DataComponent"
 import CategoryTitle from "@/components/CategoryTitle"
 import Header from "@/components/Header"
+import Footer from "@/components/Footer"
 
 function LatestUpdatesPage() {
   const [data, setData] = useState([])
@@ -68,6 +69,7 @@ function LatestUpdatesPage() {
           <DataComponent isLoading={isLoading} error={error} data={data} />
         </div>
       </section>
+      <Footer />
     </main>
   )
 }

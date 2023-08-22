@@ -215,8 +215,8 @@ function DriverPage({ singleDriver, latestUpdatesDriver, recentPost }) {
           <span>{driver.title}</span>
         </div>
 
-        <div className="flex gap-24 mt-12">
-          <div className="w-8/12">
+        <div className="flex flex-col xl:flex-row gap-24 mt-12">
+          <div className="w-full xl:w-8/12">
             <div className="flex justify-between items-center gap-4">
               <div className="w-[130px] aspect-square relative">
                 <Image
@@ -341,7 +341,7 @@ function DriverPage({ singleDriver, latestUpdatesDriver, recentPost }) {
             </div>
             <div className="mt-16">
               <h1 className="font-medium text-2xl mb-2">User Reviews</h1>
-              <div className="flex justify-between items-center gap-10">
+              <div className="flex flex-col xl:flex-row justify-between items-center gap-6 xl:gap-10">
                 <div className="flex gap-4 items-end">
                   <p className="text-5xl text-orange">
                     {averageRating ? averageRating : 0}
@@ -373,7 +373,7 @@ function DriverPage({ singleDriver, latestUpdatesDriver, recentPost }) {
               </div>
             </div>
           </div>
-          <div className="w-4/12">
+          <div className="w-full xl:w-4/12">
             <RecentPost recentPost={recentPost} />
             <LatestUpdatesDriver latestUpdatesDriver={latestUpdatesDriver} />
           </div>
