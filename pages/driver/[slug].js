@@ -196,6 +196,10 @@ function DriverPage({ singleDriver, latestUpdatesDriver, recentPost }) {
     setDeviceDownloadUrl(getDeviceDownloadUrl())
   }, [deviceOS])
 
+  if (router.isFallback) {
+    return <div>Loading...</div>
+  }
+
   return (
     <main>
       <Header />

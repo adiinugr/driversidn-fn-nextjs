@@ -1,5 +1,6 @@
 import React from "react"
 import Image from "next/image"
+import { useRouter } from "next/router"
 
 // Third Party
 import parse from "html-react-parser"
@@ -23,7 +24,11 @@ const options = { headers: { Authorization: `Bearer ${token}` } }
 function BlogPage({ singleBlog, recentPost, latestUpdatesDriver }) {
   const blog = singleBlog[0].attributes
 
-  console.log(blog)
+  const router = useRouter()
+
+  if (router.isFallback) {
+    return <div>Loading...</div>
+  }
 
   return (
     <main>
