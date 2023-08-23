@@ -91,7 +91,8 @@ const ButtonDownloadComponent = ({
 function DriverPage({ singleDriver, latestUpdatesDriver, recentPost }) {
   const router = useRouter()
 
-  const driver = singleDriver[0].attributes
+  const driver = singleDriver.length === 0 ? [] : singleDriver[0].attributes
+
   const [deviceOS, setDeviceOS] = useState()
   const [buttonLoading, setButtonLoading] = useState(false)
   const [deviceDownloadUrl, setDeviceDownloadUrl] = useState([])
@@ -195,10 +196,6 @@ function DriverPage({ singleDriver, latestUpdatesDriver, recentPost }) {
     setDeviceOS(platform.os.toString())
     setDeviceDownloadUrl(getDeviceDownloadUrl())
   }, [deviceOS])
-
-  if (router.isFallback) {
-    return <div>Loading...</div>
-  }
 
   return (
     <main>
@@ -403,7 +400,7 @@ export const getStaticPaths = async () => {
 
   return {
     paths,
-    fallback: true
+    fallback: false
   }
 }
 
@@ -464,7 +461,7 @@ export const getStaticProps = async ({ params }) => {
 
   return {
     props: {
-      singleDriver: singleDriver.data,
+      singleDriver: singleDriver.data || [],
       latestUpdatesDriver: latestUpdatesDriver.data,
       recentPost: recentPost.data
     }

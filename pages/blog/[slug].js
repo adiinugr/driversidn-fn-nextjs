@@ -22,13 +22,9 @@ const token = process.env.NEXT_PUBLIC_STRAPI_API_TOKEN
 const options = { headers: { Authorization: `Bearer ${token}` } }
 
 function BlogPage({ singleBlog, recentPost, latestUpdatesDriver }) {
-  const blog = singleBlog[0].attributes
+  const blog = singleBlog.length === 0 ? [] : singleBlog[0].attributes
 
   const router = useRouter()
-
-  if (router.isFallback) {
-    return <div>Loading...</div>
-  }
 
   return (
     <main>
@@ -82,7 +78,7 @@ export const getStaticPaths = async () => {
 
   return {
     paths,
-    fallback: true
+    fallback: false
   }
 }
 
