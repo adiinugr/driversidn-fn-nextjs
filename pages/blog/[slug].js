@@ -22,9 +22,11 @@ const token = process.env.NEXT_PUBLIC_STRAPI_API_TOKEN
 const options = { headers: { Authorization: `Bearer ${token}` } }
 
 function BlogPage({ singleBlog, recentPost, latestUpdatesDriver }) {
-  const blog = singleBlog.length === 0 ? [] : singleBlog[0].attributes
-
   const router = useRouter()
+
+  if (router.isFallback) {
+    return <div>Loading...</div>
+  }
 
   return (
     <main>
@@ -34,22 +36,22 @@ function BlogPage({ singleBlog, recentPost, latestUpdatesDriver }) {
           <div className="w-full xl:w-8/12">
             <div className="w-full h-72 relative">
               <Image
-                src={blog.image.data.attributes.url}
+                src={singleBlog.image.data.attributes.url}
                 fill
                 className="object-cover"
-                alt={blog.title}
+                alt={singleBlog.title}
                 priority
               />
             </div>
-            <h1 className="mt-4 text-2xl font-medium">{blog.title}</h1>
+            <h1 className="mt-4 text-2xl font-medium">{singleBlog.title}</h1>
 
             <div className="mt-1 flex gap-2 italic text-sm">
-              <span>{blog.author.data.attributes.name}</span>
-              <span>{formatDate(blog.createdAt)}</span>
+              <span>{singleBlog.author.data.attributes.name}</span>
+              <span>{formatDate(singleBlog.createdAt)}</span>
             </div>
 
             <article className="mt-10 blog-description">
-              {parse(blog.content)}
+              {parse(singleBlog.content)}
             </article>
           </div>
           <div className="w-full xl:w-4/12">
@@ -78,7 +80,7 @@ export const getStaticPaths = async () => {
 
   return {
     paths,
-    fallback: false
+    fallback: true
   }
 }
 
@@ -133,7 +135,7 @@ export const getStaticProps = async ({ params }) => {
 
   return {
     props: {
-      singleBlog: singleBlog.data,
+      singleBlog: singleBlog.data[0].attributes,
       latestUpdatesDriver: latestUpdatesDriver.data,
       recentPost: recentPost.data
     }

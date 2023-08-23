@@ -62,7 +62,7 @@ const ButtonDownloadComponent = ({
     )
   }
 
-  if (deviceDownloadUrl[0]) {
+  if (deviceDownloadUrl.length > 0) {
     return (
       <button
         onClick={() =>
@@ -91,40 +91,34 @@ const ButtonDownloadComponent = ({
 function DriverPage({ singleDriver, latestUpdatesDriver, recentPost }) {
   const router = useRouter()
 
-  const driver = singleDriver.length === 0 ? [] : singleDriver[0].attributes
-
   const [deviceOS, setDeviceOS] = useState()
   const [buttonLoading, setButtonLoading] = useState(false)
   const [deviceDownloadUrl, setDeviceDownloadUrl] = useState([])
-  const [downloadCount, setDownloadCount] = useState(
-    Number(driver.downloadCount)
-  )
-  const [ratings, setRatings] = useState(driver.ratings.data)
+  const [currentDownloadCount, setCurrentDownloadCount] = useState(0)
+  const [ratings, setRatings] = useState([])
   const [isOpenReviewModal, setIsOpenReviewModal] = useState(false)
 
   const averageRating = getAverageOfNumberArray(ratings)
 
-  const getDeviceDownloadUrl = () => {
+  const getDeviceDownloadUrl = async () => {
     setButtonLoading(true)
 
-    const deviceArray = singleDriver[0].attributes.driver_files.data.filter(
-      (item) => {
-        const osArray = item.attributes.operating_systems.data
+    const deviceArray = await singleDriver.driver_files.data.filter((item) => {
+      const osArray = item.attributes.operating_systems.data
 
-        const mappedOsArray = osArray.map((os) => os.attributes.name)
+      const mappedOsArray = osArray.map((os) => os.attributes.name)
 
-        return mappedOsArray.includes(deviceOS)
-      }
-    )
+      return mappedOsArray.includes(deviceOS)
+    })
 
     setButtonLoading(false)
 
-    return deviceArray
+    setDeviceDownloadUrl(deviceArray)
   }
 
   const handleDownloadDriver = async (url) => {
     try {
-      setDownloadCount(Number(downloadCount) + 1)
+      setCurrentDownloadCount(Number(currentDownloadCount) + 1)
 
       await router.push(url)
 
@@ -138,7 +132,7 @@ function DriverPage({ singleDriver, latestUpdatesDriver, recentPost }) {
           },
           method: "PUT",
           body: JSON.stringify({
-            data: { downloadCount: Number(downloadCount) + 1 }
+            data: { downloadCount: Number(currentDownloadCount) + 1 }
           })
         }
       )
@@ -194,8 +188,17 @@ function DriverPage({ singleDriver, latestUpdatesDriver, recentPost }) {
 
   useEffect(() => {
     setDeviceOS(platform.os.toString())
-    setDeviceDownloadUrl(getDeviceDownloadUrl())
+    getDeviceDownloadUrl()
   }, [deviceOS])
+
+  useEffect(() => {
+    setCurrentDownloadCount(Number(singleDriver.downloadCount))
+    setRatings(singleDriver.ratings.data)
+  }, [])
+
+  if (router.isFallback) {
+    return <div>Loading...</div>
+  }
 
   return (
     <main>
@@ -207,13 +210,13 @@ function DriverPage({ singleDriver, latestUpdatesDriver, recentPost }) {
           </Link>{" "}
           <FiChevronRight size={20} className="text-gray-800" />{" "}
           <Link
-            href={`/manufacture/${driver.manufacture.data.attributes.name.toLowerCase()}`}
+            href={`/manufacture/${singleDriver.manufacture.data.attributes.name.toLowerCase()}`}
             className="text-primary-600 hover:underline"
           >
-            {driver.manufacture.data.attributes.name}
+            {singleDriver.manufacture.data.attributes.name}
           </Link>
           <FiChevronRight size={20} className="text-gray-800" />{" "}
-          <span>{driver.title}</span>
+          <span>{singleDriver.title}</span>
         </div>
 
         <div className="flex flex-col xl:flex-row gap-24 mt-12">
@@ -221,22 +224,22 @@ function DriverPage({ singleDriver, latestUpdatesDriver, recentPost }) {
             <div className="flex justify-between items-center gap-4">
               <div className="w-[130px] aspect-square relative">
                 <Image
-                  src={driver.image.data.attributes.url}
+                  src={singleDriver.image.data.attributes.url}
                   fill
                   className="object-cover rounded-md"
-                  alt={driver.title}
+                  alt={singleDriver.title}
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 />
               </div>
               <div className="flex-1">
                 <h3 className="font-medium text-2xl mb-2 text-gray-900">
-                  {driver.title}
+                  {singleDriver.title}
                 </h3>
                 <div className="flex items-center gap-2 text-gray-700 mb-2">
                   <span className="text-green-600 font-medium">
-                    {driver.isFree ? "Free" : "Paid"}
+                    {singleDriver.isFree ? "Free" : "Paid"}
                   </span>
-                  <span>{driver.language}</span>
+                  <span>{singleDriver.language}</span>
                 </div>
                 <div className="flex gap-4 items-center text-gray-700">
                   <div className="flex items-center gap-1">
@@ -245,7 +248,7 @@ function DriverPage({ singleDriver, latestUpdatesDriver, recentPost }) {
                   </div>
                   <div className="flex items-center gap-1">
                     <FiDownload size={20} />
-                    <p>{downloadCount ? downloadCount : 0}</p>
+                    <p>{currentDownloadCount ? currentDownloadCount : 0}</p>
                   </div>
                 </div>
               </div>
@@ -254,11 +257,11 @@ function DriverPage({ singleDriver, latestUpdatesDriver, recentPost }) {
               <tbody>
                 <tr>
                   <td className="w-56 py-1 font-medium">Operating System</td>
-                  <td>: {deviceOS}</td>
+                  <td>: {deviceOS ? deviceOS : "OS is Not Detected"}</td>
                 </tr>
                 <tr>
                   <td className="py-1 font-medium">Manufacture</td>
-                  <td>: {driver.manufacture.data.attributes.name}</td>
+                  <td>: {singleDriver.manufacture.data.attributes.name}</td>
                 </tr>
                 <tr>
                   <td className="py-1 font-medium">Size</td>
@@ -279,7 +282,7 @@ function DriverPage({ singleDriver, latestUpdatesDriver, recentPost }) {
               system.
             </p>
             <article className="mt-10 driver-description">
-              {parse(driver.description)}
+              {parse(singleDriver.description)}
             </article>
             <div className="relative overflow-x-auto mt-8">
               <table className="w-full text-sm text-left text-gray-500">
@@ -300,7 +303,7 @@ function DriverPage({ singleDriver, latestUpdatesDriver, recentPost }) {
                   </tr>
                 </thead>
                 <tbody>
-                  {driver.driver_files.data.map((file) => (
+                  {singleDriver.driver_files.data.map((file) => (
                     <tr
                       key={file.id}
                       className="bg-white border-b dark:bg-gray-800 dark:border-gray-700"
@@ -400,7 +403,7 @@ export const getStaticPaths = async () => {
 
   return {
     paths,
-    fallback: false
+    fallback: true
   }
 }
 
@@ -461,7 +464,7 @@ export const getStaticProps = async ({ params }) => {
 
   return {
     props: {
-      singleDriver: singleDriver.data || [],
+      singleDriver: singleDriver.data[0].attributes,
       latestUpdatesDriver: latestUpdatesDriver.data,
       recentPost: recentPost.data
     }
