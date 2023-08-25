@@ -1,3 +1,5 @@
+import { useRouter } from "next/router"
+
 // Utils
 import { fetchAPI } from "@/utils/fetch-api"
 
@@ -6,12 +8,19 @@ import DataComponent from "@/components/DataComponent"
 import Header from "@/components/Header"
 import BrandTitle from "@/components/BrandTitle"
 import Footer from "@/components/Footer"
+import PageLoader from "@/components/PageLoader"
 
 // Const
 const token = process.env.NEXT_PUBLIC_STRAPI_API_TOKEN
 const options = { headers: { Authorization: `Bearer ${token}` } }
 
 function LatestUpdatesPage({ data, error }) {
+  const router = useRouter()
+
+  if (router.isFallback) {
+    return <PageLoader />
+  }
+
   const brand = data[0].attributes.manufacture.data.attributes.name
 
   return (
@@ -47,7 +56,7 @@ export const getStaticPaths = async () => {
 
   return {
     paths,
-    fallback: false
+    fallback: true
   }
 }
 
@@ -72,11 +81,9 @@ export const getStaticProps = async ({ params }) => {
   }
   const responseData = await fetchAPI("/drivers", urlParamsObject, options)
 
-  if (!responseData) {
+  if (responseData.data.length === 0) {
     return {
-      props: {
-        error: true
-      }
+      notFound: true
     }
   }
 

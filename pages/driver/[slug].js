@@ -103,7 +103,7 @@ function DriverPage({ singleDriver, latestUpdatesDriver, recentPost }) {
   const getDeviceDownloadUrl = async () => {
     setButtonLoading(true)
 
-    const deviceArray = await singleDriver.driver_files.data.filter((item) => {
+    const deviceArray = await singleDriver?.driver_files.data.filter((item) => {
       const osArray = item.attributes.operating_systems.data
 
       const mappedOsArray = osArray.map((os) => os.attributes.name)
@@ -192,8 +192,8 @@ function DriverPage({ singleDriver, latestUpdatesDriver, recentPost }) {
   }, [deviceOS])
 
   useEffect(() => {
-    setCurrentDownloadCount(Number(singleDriver.downloadCount))
-    setRatings(singleDriver.ratings.data)
+    setCurrentDownloadCount(Number(singleDriver?.downloadCount))
+    setRatings(singleDriver?.ratings.data)
   }, [])
 
   if (router.isFallback) {
@@ -461,6 +461,12 @@ export const getStaticProps = async ({ params }) => {
     },
     options
   )
+
+  if (singleDriver.data.length === 0) {
+    return {
+      notFound: true
+    }
+  }
 
   return {
     props: {

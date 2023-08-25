@@ -1,4 +1,8 @@
 const getAverageOfNumberArray = (array) => {
+  if (!array) {
+    return []
+  }
+
   const initialValue = 0
   const sumWithInitial = array
     .map((item) => item.attributes.ratingValue)

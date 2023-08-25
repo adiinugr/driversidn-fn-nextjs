@@ -133,6 +133,12 @@ export const getStaticProps = async ({ params }) => {
     options
   )
 
+  if (singleBlog.data.length === 0) {
+    return {
+      notFound: true
+    }
+  }
+
   return {
     props: {
       singleBlog: singleBlog.data[0].attributes,
